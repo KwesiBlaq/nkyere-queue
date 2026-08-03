@@ -1,70 +1,42 @@
 import { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { api } from '@/api/client';
-import { useAuth } from '@/hooks/useAuth';
-import { useBranch } from '@/hooks/useBranch';
-import LoginForm from '@/components/LoginForm';
+import type { AdminContext } from '@/components/AdminLayout';
 import type { ReportOverview, ServiceTypeVolume, TellerThroughput } from '@/api/types';
 
 type Range = 'today' | '7d' | '30d';
 
 const RANGE_LABELS: Record<Range, string> = { today: 'Today', '7d': 'Last 7 days', '30d': 'Last 30 days' };
 
-export default function AdminDashboard() {
-    const { branch } = useBranch();
-    const { token, user, loading, login, hasRole, logout } = useAuth();
+export default function DashboardPage() {
+    const { branch } = useOutletContext<AdminContext>();
     const [range, setRange] = useState<Range>('today');
     const [overview, setOverview] = useState<ReportOverview | null>(null);
     const [serviceTypes, setServiceTypes] = useState<ServiceTypeVolume[]>([]);
     const [tellers, setTellers] = useState<TellerThroughput[]>([]);
 
     useEffect(() => {
-        if (!branch || !token || !hasRole('branch_admin')) return;
+        if (!branch) return;
 
         api.get<ReportOverview>(`/branches/${branch.id}/reports/overview`, { params: { range } }).then((res) => setOverview(res.data));
         api.get<ServiceTypeVolume[]>(`/branches/${branch.id}/reports/service-types`, { params: { range } }).then((res) => setServiceTypes(res.data));
         api.get<TellerThroughput[]>(`/branches/${branch.id}/reports/tellers`, { params: { range } }).then((res) => setTellers(res.data));
-    }, [branch, token, range, hasRole]);
-
-    if (loading) {
-        return <div className="min-h-screen bg-[#1a1a19]" />;
-    }
-
-    if (!token) {
-        return <LoginForm title="Branch Admin Login" defaultEmail="admin@nkyere.test" onLogin={login} />;
-    }
-
-    if (!hasRole('branch_admin')) {
-        return (
-            <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#1a1a19] text-white">
-                <p className="text-lg text-[#c3c2b7]">{user?.name} doesn't have branch admin access.</p>
-                <button onClick={logout} className="rounded-lg bg-[#2c2c2a] px-4 py-2 text-sm hover:bg-[#383835]">
-                    Log out
-                </button>
-            </div>
-        );
-    }
+    }, [branch, range]);
 
     return (
-        <div className="min-h-screen bg-[#1a1a19] p-8 text-white">
-            <div className="mx-auto max-w-5xl">
-                <div className="mb-8 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold">{branch?.name}</h1>
-                        <p className="text-[#898781]">Branch performance</p>
-                    </div>
-                    <button onClick={logout} className="text-sm text-[#898781] hover:text-white">
-                        Log out
-                    </button>
-                </div>
+        <div className="mx-auto max-w-5xl">
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold">{branch?.name}</h1>
+                <p className="text-[#898781]">Branch performance</p>
+            </div>
 
-                <RangeFilter range={range} onChange={setRange} />
+            <RangeFilter range={range} onChange={setRange} />
 
-                <StatTileRow overview={overview} />
+            <StatTileRow overview={overview} />
 
-                <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-                    <ServiceTypeBarChart data={serviceTypes} />
-                    <TellerTable data={tellers} />
-                </div>
+            <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <ServiceTypeBarChart data={serviceTypes} />
+                <TellerTable data={tellers} />
             </div>
         </div>
     );

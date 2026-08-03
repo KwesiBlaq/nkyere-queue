@@ -52,6 +52,11 @@ Route::middleware([
             Route::get('/branches/{branch}/reports/overview', [ReportingController::class, 'overview']);
             Route::get('/branches/{branch}/reports/service-types', [ReportingController::class, 'serviceTypeVolume']);
             Route::get('/branches/{branch}/reports/tellers', [ReportingController::class, 'tellerThroughput']);
+
+            Route::get('/branches/{branch}/admin/promo-content', [PromoContentController::class, 'adminIndex']);
+            Route::post('/branches/{branch}/admin/promo-content', [PromoContentController::class, 'store']);
+            Route::put('/admin/promo-content/{promo}', [PromoContentController::class, 'update']);
+            Route::delete('/admin/promo-content/{promo}', [PromoContentController::class, 'destroy']);
         });
     });
 });

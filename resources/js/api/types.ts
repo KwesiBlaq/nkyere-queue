@@ -62,3 +62,13 @@ export interface TellerThroughput {
     tickets_served: number;
     avg_service_seconds: number | null;
 }
+
+export interface PromoContentAdmin {
+    id: number;
+    title: string;
+    body: string | null;
+    image_url: string | null;
+    display_seconds: number;
+    sort_order: number;
+    is_active: boolean;
+}
