@@ -2,6 +2,7 @@
 
 namespace Modules\QueueEngine\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Ticket extends Model
 {
     protected $fillable = [
-        'branch_id', 'service_type_id', 'counter_id', 'ticket_number',
+        'branch_id', 'service_type_id', 'counter_id', 'served_by', 'ticket_number',
         'sequence', 'status', 'priority', 'called_at', 'served_at', 'completed_at',
     ];
 
@@ -32,6 +33,11 @@ class Ticket extends Model
     public function counter(): BelongsTo
     {
         return $this->belongsTo(Counter::class);
+    }
+
+    public function servedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'served_by');
     }
 
     public function events(): HasMany

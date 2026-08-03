@@ -10,6 +10,7 @@ use Modules\QueueEngine\Services\TicketService;
 beforeEach(function () {
     Artisan::call('migrate', [
         '--path' => [
+            'database/migrations/tenant',
             'Modules/QueueEngine/database/migrations/tenant',
         ],
         '--realpath' => false,

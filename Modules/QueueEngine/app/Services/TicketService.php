@@ -14,13 +14,6 @@ use Modules\QueueEngine\Models\Ticket;
 
 class TicketService
 {
-    /**
-     * Priority tickets (VIP, accessibility) jump ahead of normal ones, but
-     * are still served FIFO relative to other priority tickets — nobody
-     * skips a queue they weren't already ahead in.
-     */
-    private const PRIORITY_ORDER = ['vip' => 0, 'accessibility' => 0, 'normal' => 1];
-
     public function issueTicket(Branch $branch, ServiceType $serviceType, string $priority = 'normal'): Ticket
     {
         return DB::transaction(function () use ($branch, $serviceType, $priority) {
@@ -52,9 +45,9 @@ class TicketService
         });
     }
 
-    public function callNext(Counter $counter): ?Ticket
+    public function callNext(Counter $counter, ?int $servedBy = null): ?Ticket
     {
-        return DB::transaction(function () use ($counter) {
+        return DB::transaction(function () use ($counter, $servedBy) {
             $ticket = Ticket::where('branch_id', $counter->branch_id)
                 ->where('status', 'waiting')
                 ->orderByRaw("case priority when 'normal' then 1 else 0 end")
@@ -69,6 +62,7 @@ class TicketService
             $ticket->update([
                 'status' => 'called',
                 'counter_id' => $counter->id,
+                'served_by' => $servedBy,
                 'called_at' => now(),
             ]);
 

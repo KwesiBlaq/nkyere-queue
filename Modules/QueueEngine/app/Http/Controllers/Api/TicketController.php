@@ -31,9 +31,9 @@ class TicketController extends Controller
         return new TicketResource($ticket->load('serviceType', 'counter'));
     }
 
-    public function callNext(Counter $counter)
+    public function callNext(Request $request, Counter $counter)
     {
-        $ticket = $this->tickets->callNext($counter);
+        $ticket = $this->tickets->callNext($counter, $request->user()->id);
 
         if (! $ticket) {
             return response()->json(['message' => 'No tickets waiting.'], 404);

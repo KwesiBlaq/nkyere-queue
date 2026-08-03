@@ -35,3 +35,30 @@ export interface PromoItem {
     image_url: string | null;
     display_seconds: number;
 }
+
+export interface AuthUser {
+    id: number;
+    name: string;
+    email: string;
+    roles: string[];
+}
+
+export interface ReportOverview {
+    issued: number;
+    completed: number;
+    no_show: number;
+    no_show_rate: number;
+    avg_wait_seconds: number | null;
+    avg_service_seconds: number | null;
+}
+
+export interface ServiceTypeVolume {
+    service_type: string;
+    ticket_count: number;
+}
+
+export interface TellerThroughput {
+    teller: string;
+    tickets_served: number;
+    avg_service_seconds: number | null;
+}

@@ -7,6 +7,7 @@ use Modules\Auth\Http\Controllers\AuthController;
 use Modules\QueueEngine\Http\Controllers\Api\BranchController;
 use Modules\QueueEngine\Http\Controllers\Api\CounterController;
 use Modules\QueueEngine\Http\Controllers\Api\QueueStateController;
+use Modules\QueueEngine\Http\Controllers\Api\ReportingController;
 use Modules\QueueEngine\Http\Controllers\Api\ServiceTypeController;
 use Modules\QueueEngine\Http\Controllers\Api\TicketController;
 use Modules\Signage\Http\Controllers\Api\PromoContentController;
@@ -46,5 +47,11 @@ Route::middleware([
         Route::post('/tickets/{ticket}/serve', [TicketController::class, 'serve']);
         Route::post('/tickets/{ticket}/complete', [TicketController::class, 'complete']);
         Route::post('/tickets/{ticket}/no-show', [TicketController::class, 'noShow']);
+
+        Route::middleware('role:branch_admin')->group(function () {
+            Route::get('/branches/{branch}/reports/overview', [ReportingController::class, 'overview']);
+            Route::get('/branches/{branch}/reports/service-types', [ReportingController::class, 'serviceTypeVolume']);
+            Route::get('/branches/{branch}/reports/tellers', [ReportingController::class, 'tellerThroughput']);
+        });
     });
 });

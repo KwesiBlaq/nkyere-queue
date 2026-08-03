@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/api/client';
+import { useAuth } from '@/hooks/useAuth';
 import { useBranch } from '@/hooks/useBranch';
+import LoginForm from '@/components/LoginForm';
 import type { Counter, Ticket } from '@/api/types';
 
 export default function TellerConsole() {
     const { branch } = useBranch();
-    const [token, setToken] = useState(() => localStorage.getItem('nkyere_token'));
+    const { token, loading, login } = useAuth();
     const [counters, setCounters] = useState<Counter[]>([]);
     const [counterId, setCounterId] = useState<number | null>(null);
     const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
@@ -17,8 +19,12 @@ export default function TellerConsole() {
         api.get<Counter[]>(`/branches/${branch.id}/counters`).then((res) => setCounters(res.data));
     }, [branch]);
 
+    if (loading) {
+        return <div className="min-h-screen bg-slate-950" />;
+    }
+
     if (!token) {
-        return <LoginForm onLoggedIn={setToken} />;
+        return <LoginForm title="Teller Login" defaultEmail="teller@nkyere.test" onLogin={login} />;
     }
 
     async function callNext() {
@@ -127,55 +133,5 @@ function ActionButton({
         >
             {children}
         </button>
-    );
-}
-
-function LoginForm({ onLoggedIn }: { onLoggedIn: (token: string) => void }) {
-    const [email, setEmail] = useState('teller@nkyere.test');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState<string | null>(null);
-    const [busy, setBusy] = useState(false);
-
-    async function submit(e: React.FormEvent) {
-        e.preventDefault();
-        setBusy(true);
-        setError(null);
-        try {
-            const res = await api.post('/auth/login', { email, password });
-            localStorage.setItem('nkyere_token', res.data.token);
-            onLoggedIn(res.data.token);
-        } catch {
-            setError('Invalid credentials.');
-        } finally {
-            setBusy(false);
-        }
-    }
-
-    return (
-        <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-            <form onSubmit={submit} className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900 p-8">
-                <h1 className="mb-6 text-2xl font-bold">Teller Login</h1>
-                <input
-                    className="mb-3 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <input
-                    className="mb-4 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"
-                    placeholder="Password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
-                <button
-                    disabled={busy}
-                    className="w-full rounded-lg bg-emerald-600 p-3 font-semibold hover:bg-emerald-500 disabled:opacity-50"
-                >
-                    Log in
-                </button>
-            </form>
-        </div>
     );
 }
