@@ -1,0 +1,109 @@
+services:
+
+  # ── MariaDB 11 ───────────────────────────────────────────────────────────────
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE:      nkyere
+      MARIADB_USER:          nkyere_user
+      MARIADB_PASSWORD:      secret
+      MARIADB_ROOT_PASSWORD: secret
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis 7 ──────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Laravel Reverb (WebSocket server — queue-state + call-out broadcasts) ────
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_ENV:    local
+      DB_HOST:    db
+      REDIS_HOST: redis
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles:
+      - reverb
+
+  # ── Laravel Horizon (queue workers + dashboard — Windows-safe alternative) ───
+  horizon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["php", "artisan", "horizon"]
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_ENV:    local
+      DB_HOST:    db
+      REDIS_HOST: redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles:
+      - horizon
+
+  # ── Laravel App (for staging / CI runs) ─────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV:              staging
+      DB_CONNECTION:        mysql
+      DB_HOST:              db
+      DB_PORT:              3306
+      DB_DATABASE:          nkyere
+      DB_USERNAME:          nkyere_user
+      DB_PASSWORD:          secret
+      REDIS_HOST:           redis
+      QUEUE_CONNECTION:     redis
+      CACHE_STORE:          redis
+      SESSION_DRIVER:       redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles:
+      - full
+
+volumes:
+  mariadb_data:
+  redis_data:

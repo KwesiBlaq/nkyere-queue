@@ -1,0 +1,11 @@
+{
+    "name": "QueueEngine",
+    "alias": "queueengine",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\QueueEngine\\Providers\\QueueEngineServiceProvider"
+    ],
+    "files": []
+}

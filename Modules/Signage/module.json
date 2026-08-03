@@ -1,0 +1,11 @@
+{
+    "name": "Signage",
+    "alias": "signage",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Signage\\Providers\\SignageServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,11 @@
+{
+    "name": "DeviceBridge",
+    "alias": "devicebridge",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\DeviceBridge\\Providers\\DeviceBridgeServiceProvider"
+    ],
+    "files": []
+}

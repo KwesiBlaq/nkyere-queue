@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/devicebridge",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\DeviceBridge\\": "app/",
+            "Modules\\DeviceBridge\\Database\\Factories\\": "database/factories/",
+            "Modules\\DeviceBridge\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\DeviceBridge\\Tests\\": "tests/"
+        }
+    }
+}

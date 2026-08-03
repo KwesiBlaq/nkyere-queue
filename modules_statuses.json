@@ -1,0 +1,7 @@
+{
+    "Tenancy": true,
+    "QueueEngine": true,
+    "DeviceBridge": true,
+    "Signage": true,
+    "Auth": true
+}
