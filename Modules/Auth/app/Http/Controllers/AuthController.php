@@ -23,6 +23,10 @@ class AuthController extends Controller
             throw ValidationException::withMessages(['email' => 'These credentials do not match our records.']);
         }
 
+        if (! $user->is_active) {
+            throw ValidationException::withMessages(['email' => 'This account has been deactivated.']);
+        }
+
         return response()->json([
             'token' => $user->createToken('teller-console')->plainTextToken,
             'user' => [

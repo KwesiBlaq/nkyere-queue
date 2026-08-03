@@ -72,3 +72,24 @@ export interface PromoContentAdmin {
     sort_order: number;
     is_active: boolean;
 }
+
+export interface ServiceTypeAdmin {
+    id: number;
+    name: string;
+    prefix: string;
+    is_active: boolean;
+}
+
+export interface CounterAdmin {
+    id: number;
+    label: string;
+    is_open: boolean;
+}
+
+export interface StaffMember {
+    id: number;
+    name: string;
+    email: string;
+    role: 'teller' | 'branch_admin';
+    is_active: boolean;
+}

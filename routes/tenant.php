@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 use Modules\Auth\Http\Controllers\AuthController;
+use Modules\Auth\Http\Controllers\StaffController;
 use Modules\QueueEngine\Http\Controllers\Api\BranchController;
 use Modules\QueueEngine\Http\Controllers\Api\CounterController;
 use Modules\QueueEngine\Http\Controllers\Api\QueueStateController;
@@ -57,6 +58,21 @@ Route::middleware([
             Route::post('/branches/{branch}/admin/promo-content', [PromoContentController::class, 'store']);
             Route::put('/admin/promo-content/{promo}', [PromoContentController::class, 'update']);
             Route::delete('/admin/promo-content/{promo}', [PromoContentController::class, 'destroy']);
+
+            Route::get('/branches/{branch}/admin/service-types', [ServiceTypeController::class, 'adminIndex']);
+            Route::post('/branches/{branch}/admin/service-types', [ServiceTypeController::class, 'store']);
+            Route::put('/admin/service-types/{serviceType}', [ServiceTypeController::class, 'update']);
+            Route::delete('/admin/service-types/{serviceType}', [ServiceTypeController::class, 'destroy']);
+
+            Route::get('/branches/{branch}/admin/counters', [CounterController::class, 'adminIndex']);
+            Route::post('/branches/{branch}/admin/counters', [CounterController::class, 'store']);
+            Route::put('/admin/counters/{counter}', [CounterController::class, 'update']);
+            Route::delete('/admin/counters/{counter}', [CounterController::class, 'destroy']);
+
+            Route::get('/admin/staff', [StaffController::class, 'index']);
+            Route::post('/admin/staff', [StaffController::class, 'store']);
+            Route::put('/admin/staff/{user}', [StaffController::class, 'update']);
+            Route::delete('/admin/staff/{user}', [StaffController::class, 'destroy']);
         });
     });
 });

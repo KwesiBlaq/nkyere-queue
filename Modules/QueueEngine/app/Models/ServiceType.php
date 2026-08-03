@@ -8,7 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ServiceType extends Model
 {
-    protected $fillable = ['branch_id', 'name', 'prefix'];
+    protected $fillable = ['branch_id', 'name', 'prefix', 'is_active'];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 
     public function branch(): BelongsTo
     {

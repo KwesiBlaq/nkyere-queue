@@ -19,6 +19,15 @@ export default function AdminSidebar({ branchName, onLogout }: { branchName?: st
                 <NavLink to="/admin/concierge" className={linkClass}>
                     Concierge Content
                 </NavLink>
+                <NavLink to="/admin/service-types" className={linkClass}>
+                    Service Types
+                </NavLink>
+                <NavLink to="/admin/counters" className={linkClass}>
+                    Counters
+                </NavLink>
+                <NavLink to="/admin/staff" className={linkClass}>
+                    Staff
+                </NavLink>
             </nav>
             <button onClick={onLogout} className="mt-4 rounded-lg px-3 py-2 text-left text-sm text-[#898781] hover:text-white">
                 Log out
