@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { Landmark } from 'lucide-react';
+import { Field, TextInput } from '@/components/ui/Field';
+import Button from '@/components/ui/Button';
 
 export default function LoginForm({
     title,
@@ -28,29 +31,27 @@ export default function LoginForm({
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-            <form onSubmit={submit} className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900 p-8">
-                <h1 className="mb-6 text-2xl font-bold">{title}</h1>
-                <input
-                    className="mb-3 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <input
-                    className="mb-4 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"
-                    placeholder="Password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
-                <button
-                    disabled={busy}
-                    className="w-full rounded-lg bg-emerald-600 p-3 font-semibold hover:bg-emerald-500 disabled:opacity-50"
-                >
-                    Log in
-                </button>
+        <div className="flex min-h-screen items-center justify-center bg-surface text-ink-primary">
+            <form onSubmit={submit} className="w-full max-w-sm rounded-2xl border border-border-subtle/10 bg-surface-raised p-8">
+                <div className="mb-6 flex items-center gap-2.5">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent">
+                        <Landmark size={18} className="text-white" />
+                    </div>
+                    <h1 className="text-xl font-bold">{title}</h1>
+                </div>
+
+                <Field label="Email">
+                    <TextInput value={email} onChange={(e) => setEmail(e.target.value)} />
+                </Field>
+                <Field label="Password">
+                    <TextInput type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                </Field>
+
+                {error && <p className="mb-4 text-sm text-danger">{error}</p>}
+
+                <Button variant="primary" disabled={busy} className="w-full">
+                    {busy ? 'Signing in…' : 'Log in'}
+                </Button>
             </form>
         </div>
     );

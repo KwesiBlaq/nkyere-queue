@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { Ticket, Clock, CheckCircle2, AlertTriangle, Check } from 'lucide-react';
 import { api } from '@/api/client';
+import Card from '@/components/ui/Card';
 import type { AdminContext } from '@/components/AdminLayout';
 import type { ReportOverview, ServiceTypeVolume, TellerThroughput } from '@/api/types';
 
@@ -27,7 +29,7 @@ export default function DashboardPage() {
         <div className="mx-auto max-w-5xl">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold">{branch?.name}</h1>
-                <p className="text-[#898781]">Branch performance</p>
+                <p className="text-ink-muted">Branch performance</p>
             </div>
 
             <RangeFilter range={range} onChange={setRange} />
@@ -44,16 +46,16 @@ export default function DashboardPage() {
 
 function RangeFilter({ range, onChange }: { range: Range; onChange: (r: Range) => void }) {
     return (
-        <div className="mb-8 flex gap-1 rounded-lg border border-[rgba(255,255,255,0.10)] p-1" style={{ width: 'fit-content' }}>
+        <div className="mb-8 flex w-fit gap-1 rounded-lg border border-border-subtle/10 p-1">
             {(Object.keys(RANGE_LABELS) as Range[]).map((key) => (
                 <button
                     key={key}
                     onClick={() => onChange(key)}
                     className={`rounded-md px-4 py-2 text-sm transition ${
-                        range === key ? 'bg-[#2c2c2a] font-semibold text-white' : 'text-[#898781] hover:text-white'
+                        range === key ? 'bg-surface-hover font-semibold text-ink-primary' : 'text-ink-muted hover:text-ink-primary'
                     }`}
                 >
-                    {range === key && <span className="mr-1.5">✓</span>}
+                    {range === key && <Check size={14} className="mr-1.5 inline" />}
                     {RANGE_LABELS[key]}
                 </button>
             ))}
@@ -66,32 +68,46 @@ function StatTileRow({ overview }: { overview: ReportOverview | null }) {
 
     return (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <StatTile label="Tickets issued" value={overview?.issued ?? '—'} />
-            <StatTile label="Avg wait time" value={formatDuration(overview?.avg_wait_seconds)} />
-            <StatTile label="Avg service time" value={formatDuration(overview?.avg_service_seconds)} />
+            <StatTile icon={Ticket} label="Tickets issued" value={overview?.issued ?? '—'} />
+            <StatTile icon={Clock} label="Avg wait time" value={formatDuration(overview?.avg_wait_seconds)} />
+            <StatTile icon={CheckCircle2} label="Avg service time" value={formatDuration(overview?.avg_service_seconds)} />
             <StatTile
+                icon={AlertTriangle}
                 label="No-show rate"
                 value={overview ? `${overview.no_show_rate}%` : '—'}
-                accent={noShowHigh ? '#fab219' : undefined}
-                badge={noShowHigh ? '⚠ high' : undefined}
+                tone={noShowHigh ? 'warning' : 'default'}
+                badge={noShowHigh ? 'Higher than usual' : undefined}
             />
         </div>
     );
 }
 
-function StatTile({ label, value, accent, badge }: { label: string; value: string | number; accent?: string; badge?: string }) {
+function StatTile({
+    icon: Icon,
+    label,
+    value,
+    tone = 'default',
+    badge,
+}: {
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    label: string;
+    value: string | number;
+    tone?: 'default' | 'warning';
+    badge?: string;
+}) {
+    const accent = tone === 'warning' ? 'text-warning' : 'text-accent';
+
     return (
-        <div className="rounded-2xl border border-[rgba(255,255,255,0.10)] bg-[#0d0d0d] p-5">
-            <p className="text-sm text-[#898781]">{label}</p>
-            <p className="mt-1 text-3xl font-bold" style={{ color: accent ?? '#ffffff', fontVariantNumeric: 'proportional-nums' }}>
+        <Card className="p-5">
+            <div className={`mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-current/15 ${accent}`}>
+                <Icon size={18} className={accent} />
+            </div>
+            <p className="text-sm text-ink-muted">{label}</p>
+            <p className="mt-1 text-3xl font-bold" style={{ fontVariantNumeric: 'proportional-nums' }}>
                 {value}
             </p>
-            {badge && (
-                <p className="mt-1 text-xs" style={{ color: accent }}>
-                    {badge}
-                </p>
-            )}
-        </div>
+            {badge && <p className={`mt-1 text-xs ${accent}`}>{badge}</p>}
+        </Card>
     );
 }
 
@@ -100,12 +116,12 @@ function ServiceTypeBarChart({ data }: { data: ServiceTypeVolume[] }) {
     const [hovered, setHovered] = useState<string | null>(null);
 
     return (
-        <div className="rounded-2xl border border-[rgba(255,255,255,0.10)] bg-[#0d0d0d] p-6">
-            <h2 className="mb-6 text-sm font-semibold text-[#c3c2b7]">Ticket volume by service type</h2>
+        <Card>
+            <h2 className="mb-6 text-sm font-semibold text-ink-secondary">Ticket volume by service type</h2>
             {data.length === 0 ? (
-                <p className="text-sm text-[#898781]">No tickets in this range.</p>
+                <p className="text-sm text-ink-muted">No tickets in this range.</p>
             ) : (
-                <div className="flex h-48 items-end gap-3 border-b border-[#383835]">
+                <div className="flex h-48 items-end gap-3 border-b border-border">
                     {data.map((row) => (
                         <div
                             key={row.service_type}
@@ -114,12 +130,12 @@ function ServiceTypeBarChart({ data }: { data: ServiceTypeVolume[] }) {
                             onMouseLeave={() => setHovered(null)}
                         >
                             {hovered === row.service_type && (
-                                <div className="absolute -top-8 rounded-md bg-[#2c2c2a] px-2 py-1 text-xs whitespace-nowrap text-white">
+                                <div className="absolute -top-8 rounded-md bg-surface-hover px-2 py-1 text-xs whitespace-nowrap text-ink-primary">
                                     {row.ticket_count} tickets
                                 </div>
                             )}
                             <div
-                                className="w-full rounded-t-[4px] bg-[#3987e5] transition-opacity group-hover:opacity-80"
+                                className="w-full rounded-t-[4px] bg-accent transition-opacity group-hover:opacity-80"
                                 style={{ height: `${Math.max(4, (row.ticket_count / max) * 100)}%` }}
                             />
                         </div>
@@ -129,43 +145,39 @@ function ServiceTypeBarChart({ data }: { data: ServiceTypeVolume[] }) {
             {data.length > 0 && (
                 <div className="mt-2 flex gap-3">
                     {data.map((row) => (
-                        <div key={row.service_type} className="flex-1 text-center text-xs text-[#898781]">
+                        <div key={row.service_type} className="flex-1 text-center text-xs text-ink-muted">
                             {row.service_type}
                         </div>
                     ))}
                 </div>
             )}
-        </div>
+        </Card>
     );
 }
 
 function TellerTable({ data }: { data: TellerThroughput[] }) {
     return (
-        <div className="rounded-2xl border border-[rgba(255,255,255,0.10)] bg-[#0d0d0d] p-6">
-            <h2 className="mb-4 text-sm font-semibold text-[#c3c2b7]">Teller throughput</h2>
+        <Card>
+            <h2 className="mb-4 text-sm font-semibold text-ink-secondary">Teller throughput</h2>
             {data.length === 0 ? (
-                <p className="text-sm text-[#898781]">No completed tickets in this range.</p>
+                <p className="text-sm text-ink-muted">No completed tickets in this range.</p>
             ) : (
                 <table className="w-full text-left text-sm">
                     <thead>
-                        <tr className="border-b border-[#383835] text-[#898781]">
+                        <tr className="border-b border-border text-ink-muted">
                             <th className="pb-2 font-normal">Teller</th>
-                            <th className="pb-2 font-normal" style={{ textAlign: 'right' }}>
-                                Served
-                            </th>
-                            <th className="pb-2 font-normal" style={{ textAlign: 'right' }}>
-                                Avg time
-                            </th>
+                            <th className="pb-2 text-right font-normal">Served</th>
+                            <th className="pb-2 text-right font-normal">Avg time</th>
                         </tr>
                     </thead>
                     <tbody>
                         {data.map((row) => (
-                            <tr key={row.teller} className="border-b border-[#2c2c2a] last:border-0">
+                            <tr key={row.teller} className="border-b border-surface-hover last:border-0">
                                 <td className="py-2.5">{row.teller}</td>
-                                <td className="py-2.5" style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                                <td className="py-2.5 text-right" style={{ fontVariantNumeric: 'tabular-nums' }}>
                                     {row.tickets_served}
                                 </td>
-                                <td className="py-2.5" style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                                <td className="py-2.5 text-right" style={{ fontVariantNumeric: 'tabular-nums' }}>
                                     {formatDuration(row.avg_service_seconds)}
                                 </td>
                             </tr>
@@ -173,7 +185,7 @@ function TellerTable({ data }: { data: TellerThroughput[] }) {
                     </tbody>
                 </table>
             )}
-        </div>
+        </Card>
     );
 }
 

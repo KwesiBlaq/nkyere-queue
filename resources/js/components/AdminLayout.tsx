@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useBranch } from '@/hooks/useBranch';
 import LoginForm from '@/components/LoginForm';
 import AdminSidebar from '@/components/AdminSidebar';
+import Button from '@/components/ui/Button';
 import type { AuthUser, Branch } from '@/api/types';
 
 export interface AdminContext {
@@ -15,7 +16,7 @@ export default function AdminLayout() {
     const { token, user, loading, login, hasRole, logout } = useAuth();
 
     if (loading) {
-        return <div className="min-h-screen bg-[#1a1a19]" />;
+        return <div className="min-h-screen bg-surface" />;
     }
 
     if (!token) {
@@ -24,18 +25,18 @@ export default function AdminLayout() {
 
     if (!hasRole('branch_admin')) {
         return (
-            <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#1a1a19] text-white">
-                <p className="text-lg text-[#c3c2b7]">{user?.name} doesn't have branch admin access.</p>
-                <button onClick={logout} className="rounded-lg bg-[#2c2c2a] px-4 py-2 text-sm hover:bg-[#383835]">
+            <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-surface text-ink-primary">
+                <p className="text-lg text-ink-secondary">{user?.name} doesn't have branch admin access.</p>
+                <Button variant="ghost" onClick={logout} className="border border-border">
                     Log out
-                </button>
+                </Button>
             </div>
         );
     }
 
     return (
-        <div className="flex min-h-screen bg-[#1a1a19] text-white">
-            <AdminSidebar branchName={branch?.name} onLogout={logout} />
+        <div className="flex min-h-screen bg-surface text-ink-primary">
+            <AdminSidebar branchName={branch?.name} user={user} onLogout={logout} />
             <main className="flex-1 overflow-y-auto p-8">
                 <Outlet context={{ branch, user } satisfies AdminContext} />
             </main>

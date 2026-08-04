@@ -10,4 +10,24 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /*
+     * Admin panel dark palette. Page recedes (surface), cards/sidebar sit
+     * above it (surface-raised) — elevation the Phase 2 build had backwards
+     * (cards were literally darker than the page). Values match the dataviz
+     * skill's validated dark-mode chart-chrome + status tokens.
+     */
+    --color-surface: #0d0d0d;
+    --color-surface-raised: #1a1a19;
+    --color-surface-hover: #2c2c2a;
+    --color-border-subtle: #ffffff;
+    --color-border: #383835;
+    --color-ink-primary: #ffffff;
+    --color-ink-secondary: #c3c2b7;
+    --color-ink-muted: #898781;
+    --color-accent: #3987e5;
+    --color-accent-hover: #256abf;
+    --color-success: #0ca30c;
+    --color-warning: #fab219;
+    --color-danger: #e66767;
 }

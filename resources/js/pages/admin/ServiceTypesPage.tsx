@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { api } from '@/api/client';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import Modal from '@/components/ui/Modal';
+import { Field, TextInput } from '@/components/ui/Field';
 import type { AdminContext } from '@/components/AdminLayout';
 import type { ServiceTypeAdmin } from '@/api/types';
 
@@ -79,25 +85,22 @@ export default function ServiceTypesPage() {
             <div className="mb-8 flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold">Service Types</h1>
-                    <p className="text-[#898781]">The categories customers pick from at the kiosk.</p>
+                    <p className="text-ink-muted">The categories customers pick from at the kiosk.</p>
                 </div>
-                <button
-                    onClick={openCreate}
-                    className="rounded-lg bg-[#3987e5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#256abf]"
-                >
+                <Button variant="primary" icon={Plus} onClick={openCreate}>
                     Add service type
-                </button>
+                </Button>
             </div>
 
             {loading ? (
-                <p className="text-sm text-[#898781]">Loading…</p>
+                <p className="text-sm text-ink-muted">Loading…</p>
             ) : items.length === 0 ? (
-                <p className="text-sm text-[#898781]">No service types yet.</p>
+                <Card className="text-sm text-ink-muted">No service types yet.</Card>
             ) : (
-                <div className="overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.10)]">
+                <Card className="overflow-hidden p-0">
                     <table className="w-full text-left text-sm">
                         <thead>
-                            <tr className="border-b border-[#383835] bg-[#0d0d0d] text-[#898781]">
+                            <tr className="border-b border-border text-ink-muted">
                                 <th className="p-3 font-normal">Prefix</th>
                                 <th className="p-3 font-normal">Name</th>
                                 <th className="p-3 font-normal">Status</th>
@@ -106,59 +109,41 @@ export default function ServiceTypesPage() {
                         </thead>
                         <tbody>
                             {items.map((item) => (
-                                <tr key={item.id} className="border-b border-[#2c2c2a] bg-[#0d0d0d] last:border-0">
+                                <tr key={item.id} className="border-b border-surface-hover last:border-0">
                                     <td className="p-3 font-semibold">{item.prefix}</td>
                                     <td className="p-3">{item.name}</td>
                                     <td className="p-3">
-                                        {item.is_active ? (
-                                            <span className="text-[#0ca30c]">Active</span>
-                                        ) : (
-                                            <span className="text-[#898781]">Inactive</span>
-                                        )}
+                                        <Badge variant={item.is_active ? 'success' : 'neutral'}>
+                                            {item.is_active ? 'Active' : 'Inactive'}
+                                        </Badge>
                                     </td>
                                     <td className="p-3 text-right whitespace-nowrap">
-                                        <button onClick={() => openEdit(item)} className="mr-3 text-[#3987e5] hover:underline">
-                                            Edit
-                                        </button>
-                                        <button onClick={() => remove(item)} className="text-[#e66767] hover:underline">
-                                            Delete
-                                        </button>
+                                        <Button variant="ghost" icon={Pencil} iconOnly title="Edit" onClick={() => openEdit(item)} />
+                                        <Button variant="danger" icon={Trash2} iconOnly title="Delete" onClick={() => remove(item)} />
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                </div>
+                </Card>
             )}
 
             {form && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/60 p-4">
-                    <form
-                        onSubmit={submit}
-                        className="w-full max-w-sm rounded-2xl border border-[rgba(255,255,255,0.10)] bg-[#1a1a19] p-6"
-                    >
-                        <h2 className="mb-4 text-lg font-semibold">{form.id ? 'Edit service type' : 'Add service type'}</h2>
+                <Modal title={form.id ? 'Edit service type' : 'Add service type'} onClose={() => setForm(null)}>
+                    <form onSubmit={submit}>
+                        <Field label="Name">
+                            <TextInput required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                        </Field>
 
-                        <label className="mb-3 block">
-                            <span className="mb-1 block text-xs text-[#898781]">Name</span>
-                            <input
-                                required
-                                value={form.name}
-                                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                className="w-full rounded-lg border border-[#383835] bg-[#0d0d0d] p-2.5 text-sm"
-                            />
-                        </label>
-
-                        <label className="mb-4 block">
-                            <span className="mb-1 block text-xs text-[#898781]">Prefix (1–2 letters, used on tickets)</span>
-                            <input
+                        <Field label="Prefix (1–2 letters, used on tickets)">
+                            <TextInput
                                 required
                                 maxLength={2}
                                 value={form.prefix}
                                 onChange={(e) => setForm({ ...form, prefix: e.target.value })}
-                                className="w-24 rounded-lg border border-[#383835] bg-[#0d0d0d] p-2.5 text-sm uppercase"
+                                className="w-24 uppercase"
                             />
-                        </label>
+                        </Field>
 
                         <label className="mb-6 flex items-center gap-2 text-sm">
                             <input
@@ -169,25 +154,18 @@ export default function ServiceTypesPage() {
                             Active (shown at the kiosk)
                         </label>
 
-                        {formError && <p className="mb-4 text-sm text-[#e66767]">{formError}</p>}
+                        {formError && <p className="mb-4 text-sm text-danger">{formError}</p>}
 
                         <div className="flex justify-end gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setForm(null)}
-                                className="rounded-lg px-4 py-2 text-sm text-[#898781] hover:text-white"
-                            >
+                            <Button type="button" variant="ghost" onClick={() => setForm(null)}>
                                 Cancel
-                            </button>
-                            <button
-                                disabled={saving}
-                                className="rounded-lg bg-[#3987e5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#256abf] disabled:opacity-50"
-                            >
+                            </Button>
+                            <Button variant="primary" disabled={saving}>
                                 {saving ? 'Saving…' : 'Save'}
-                            </button>
+                            </Button>
                         </div>
                     </form>
-                </div>
+                </Modal>
             )}
         </div>
     );
