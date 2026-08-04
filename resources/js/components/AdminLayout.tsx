@@ -3,6 +3,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useBranch } from '@/hooks/useBranch';
 import LoginForm from '@/components/LoginForm';
 import AdminSidebar from '@/components/AdminSidebar';
+import AdminTopBar from '@/components/AdminTopBar';
+import AdminFooter from '@/components/AdminFooter';
 import Button from '@/components/ui/Button';
 import type { AuthUser, Branch } from '@/api/types';
 
@@ -37,9 +39,13 @@ export default function AdminLayout() {
     return (
         <div className="flex min-h-screen bg-surface text-ink-primary">
             <AdminSidebar branchName={branch?.name} user={user} onLogout={logout} />
-            <main className="flex-1 overflow-y-auto p-8">
-                <Outlet context={{ branch, user } satisfies AdminContext} />
-            </main>
+            <div className="flex flex-1 flex-col overflow-y-auto">
+                <AdminTopBar />
+                <main className="flex-1 p-8">
+                    <Outlet context={{ branch, user } satisfies AdminContext} />
+                </main>
+                <AdminFooter />
+            </div>
         </div>
     );
 }

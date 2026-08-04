@@ -125,7 +125,7 @@ function ServiceTypeBarChart({ data }: { data: ServiceTypeVolume[] }) {
                     {data.map((row) => (
                         <div
                             key={row.service_type}
-                            className="group relative flex flex-1 flex-col items-center justify-end gap-2"
+                            className="group relative flex h-full flex-1 flex-col items-center justify-end gap-2"
                             onMouseEnter={() => setHovered(row.service_type)}
                             onMouseLeave={() => setHovered(null)}
                         >
